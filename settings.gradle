@@ -1,0 +1,3 @@
+rootProject.name = 'modulefs'
+include 'modulefs'
+include 'tests'
