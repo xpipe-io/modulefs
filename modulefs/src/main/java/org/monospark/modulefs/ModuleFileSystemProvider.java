@@ -71,7 +71,13 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
             var basePath = fs.getPath("modules", moduleName);
             actualFs = new ModuleFileSystem(env != null, basePath);
         } else if (modUri.getPath().endsWith(".jar")) {
-            var jarFs = FileSystems.newFileSystem(URI.create("jar:" + modUri.toString()), env);
+            var fsUri = URI.create("jar:" + modUri.toString());
+            FileSystem jarFs;
+            try {
+                jarFs = FileSystems.newFileSystem(fsUri, env);
+            } catch (FileSystemAlreadyExistsException e) {
+                jarFs = FileSystems.getFileSystem(fsUri);
+            }
             actualFs = new ModuleFileSystem(true, jarFs.getPath("/"));
         } else {
             actualFs = new ModuleFileSystem(false, Path.of(modUri));
@@ -88,13 +94,14 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
             var moduleName = uri.getPath().substring(1);
             var fs = filesystems.get(moduleName);
             if (fs == null) {
-                try {
-                    fs = newFileSystem(uri, Map.of());
-                    filesystems.put(moduleName, fs);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                throw new FileSystemNotFoundException("No FileSystem for module " + moduleName + " found");
             }
+
+            if (!fs.isOpen()) {
+                filesystems.remove(moduleName);
+                throw new FileSystemNotFoundException("Existing FileSystem for module " + moduleName + " is closed");
+            }
+
             return fs;
         }
     }
@@ -109,9 +116,18 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         }
         var inModulePath = path.substring(moduleNameEnd + 1);
 
-        var fs = getFileSystem(URI.create("module:/" + moduleName));
+        try {
+            var fs = getFileSystem(URI.create("module:/" + moduleName));
+            return fs.getPath(inModulePath);
+        } catch (FileSystemNotFoundException e) {
+            try {
+                var fs = newFileSystem(URI.create("module:/" + moduleName), Map.of());
+                return fs.getPath(inModulePath);
+            } catch (IOException ioException) {
+                throw new UncheckedIOException(ioException);
+            }
+        }
 
-        return fs.getPath(inModulePath);
     }
 
     @Override
