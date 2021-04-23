@@ -11,7 +11,9 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ModuleFileSystemProvider extends FileSystemProvider {
 
@@ -59,31 +61,24 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         checkUri(uri);
 
         String moduleName = uri.getPath().substring(1);
-        var loc = ModuleHelper.getModuleForName(moduleName)
-                .orElseThrow(() -> new ModuleNotResolvedException(
+        var loc = ModuleLayer.boot().configuration().modules().stream()
+                .filter(r -> r.name().equals(moduleName))
+                .findFirst()
+                .orElseThrow(() -> new FileSystemNotFoundException(
                         "Module " + moduleName + " was not resolved")).reference().location();
         var modUri = loc.orElseThrow(() -> new IllegalArgumentException(
                 "Location of module " + moduleName + " is unknown"));
 
-        FileSystem actualFs;
-        if (modUri.getScheme().equals("jrt")) {
-            var fs = FileSystems.newFileSystem(URI.create("jrt:/"), env);
-            var basePath = fs.getPath("modules", moduleName);
-            actualFs = new ModuleFileSystem(env != null, basePath);
-        } else if (modUri.getPath().endsWith(".jar")) {
-            var fsUri = URI.create("jar:" + modUri.toString());
-            FileSystem jarFs;
-            try {
-                jarFs = FileSystems.newFileSystem(fsUri, env);
-            } catch (FileSystemAlreadyExistsException e) {
-                jarFs = FileSystems.getFileSystem(fsUri);
-            }
-            actualFs = new ModuleFileSystem(true, jarFs.getPath("/"));
-        } else {
-            actualFs = new ModuleFileSystem(false, Path.of(modUri));
-        }
-        filesystems.put(moduleName, actualFs);
-        return actualFs;
+        var fs = Stream.of(
+                JrtModuleFileSystem.create(this, uri, modUri),
+                JarModuleFileSystem.create(this, modUri),
+                ExplodedModuleFileSystem.create(this, modUri))
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Unsupported module file system type " + modUri.getScheme()));
+        filesystems.put(moduleName, fs);
+        return fs;
     }
 
     @Override
@@ -132,12 +127,18 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
-        throw new UnsupportedOperationException();
+        if (!options.isEmpty() && !options.equals(Set.of(StandardOpenOption.READ))) {
+            throw new UnsupportedOperationException();
+        }
+
+        var mp = ((ModulePath) path);
+        return mp.getModuleFileSystem().getBaseProvider().newByteChannel(mp.getWrappedPath(), options, attrs);
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
-        throw new UnsupportedOperationException();
+        var mp = ((ModulePath) dir);
+        return mp.getModuleFileSystem().getBaseProvider().newDirectoryStream(mp.getWrappedPath(), filter);
     }
 
     @Override

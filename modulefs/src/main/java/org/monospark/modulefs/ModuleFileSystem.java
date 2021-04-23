@@ -6,31 +6,23 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Set;
 
-public class ModuleFileSystem extends FileSystem {
+public abstract class ModuleFileSystem extends FileSystem {
 
-    private boolean closeable;
-    private Path basePath;
+    private FileSystemProvider provider;
+    protected Path basePath;
 
-    ModuleFileSystem(boolean closeable, Path basePath) {
-        this.closeable = closeable;
+    ModuleFileSystem(Path basePath, FileSystemProvider provider) {
         this.basePath = basePath;
+        this.provider = provider;
     }
 
     @Override
     public FileSystemProvider provider() {
+        return provider;
+    }
+
+    FileSystemProvider getBaseProvider() {
         return basePath.getFileSystem().provider();
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (closeable) {
-            basePath.getFileSystem().close();
-        }
-    }
-
-    @Override
-    public boolean isOpen() {
-        return basePath.getFileSystem().isOpen();
     }
 
     @Override
@@ -64,7 +56,7 @@ public class ModuleFileSystem extends FileSystem {
         for (var m : more) {
             current = current.resolve(m);
         }
-        return current;
+        return new ModulePath(this, current);
     }
 
     @Override
