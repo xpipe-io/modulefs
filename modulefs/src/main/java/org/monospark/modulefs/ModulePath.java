@@ -152,7 +152,7 @@ public class ModulePath implements Path {
 
     @Override
     public URI toUri() {
-        return URI.create("module:/" + fs.getModule() + "!" + wrappedPath.toAbsolutePath().toString());
+        return URI.create("module:/" + fs.getModule() + "!/" + wrappedPath.relativize(fs.basePath).toString());
     }
 
     @Override

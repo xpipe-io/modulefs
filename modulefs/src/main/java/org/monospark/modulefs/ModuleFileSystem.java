@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,7 +60,8 @@ public abstract class ModuleFileSystem extends FileSystem {
 
     @Override
     public Iterable<FileStore> getFileStores() {
-        return null;
+        var store = basePath.getFileSystem().getFileStores().iterator().next();
+        return List.of(new ModuleFileStore(store, this));
     }
 
     @Override

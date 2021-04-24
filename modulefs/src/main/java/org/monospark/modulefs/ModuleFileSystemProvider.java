@@ -9,10 +9,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class ModuleFileSystemProvider extends FileSystemProvider {
@@ -141,63 +138,83 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         return mp.getModuleFileSystem().getBaseProvider().newDirectoryStream(mp.getWrappedPath(), filter);
     }
 
+    private ModulePath getModulePath(Path path) {
+        Objects.requireNonNull(path, "path");
+        if (!(path instanceof ModulePath)) {
+            throw new ProviderMismatchException();
+        }
+        return (ModulePath) path;
+    }
+
+    private FileSystemProvider getBaseProvider(Path path) {
+        return getModulePath(path).getModuleFileSystem().getBaseProvider();
+    }
+
     @Override
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(dir).createDirectory(getModulePath(dir).getWrappedPath(), attrs);
     }
 
     @Override
     public void delete(Path path) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(path).delete(getModulePath(path).getWrappedPath());
     }
 
     @Override
     public void copy(Path source, Path target, CopyOption... options) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(source).copy(getModulePath(source).getWrappedPath(),
+                getModulePath(target).getWrappedPath(), options);
     }
 
     @Override
     public void move(Path source, Path target, CopyOption... options) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(source).move(getModulePath(source).getWrappedPath(),
+                getModulePath(target).getWrappedPath(), options);
     }
 
     @Override
     public boolean isSameFile(Path path, Path path2) throws IOException {
-        throw new UnsupportedOperationException();
+        return getBaseProvider(path).isSameFile(
+                getModulePath(path).getWrappedPath(),
+                getModulePath(path2).getWrappedPath());
     }
 
     @Override
     public boolean isHidden(Path path) throws IOException {
-        throw new UnsupportedOperationException();
+        return getBaseProvider(path).isHidden(getModulePath(path).getWrappedPath());
     }
 
     @Override
     public FileStore getFileStore(Path path) throws IOException {
-        throw new UnsupportedOperationException();
+        if (!Files.exists(path)) {
+            throw new NoSuchFileException(path.toString());
+        }
+
+        return getModulePath(path).getFileSystem().getFileStores().iterator().next();
     }
 
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(path).checkAccess(getModulePath(path).getWrappedPath(), modes);
     }
 
     @Override
     public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-        throw new UnsupportedOperationException();
+        return getBaseProvider(path).getFileAttributeView(getModulePath(path).getWrappedPath(), type, options);
     }
 
     @Override
     public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
-        throw new UnsupportedOperationException();
+        return getBaseProvider(path).readAttributes(getModulePath(path).getWrappedPath(), type, options);
     }
 
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
-        throw new UnsupportedOperationException();
+        return getBaseProvider(path).readAttributes(getModulePath(path).getWrappedPath(), attributes, options);
     }
 
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
-        throw new UnsupportedOperationException();
+        getBaseProvider(path).setAttribute(getModulePath(path).getWrappedPath(), attribute, value, options);
     }
 }
