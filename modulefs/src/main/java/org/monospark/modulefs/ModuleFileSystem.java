@@ -1,17 +1,30 @@
 package org.monospark.modulefs;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class ModuleFileSystem extends FileSystem {
 
-    private FileSystemProvider provider;
+    public static ModuleFileSystem create(String uri) throws IOException {
+        ModuleFileSystemProvider fsp = FileSystemProvider.installedProviders().stream()
+                .filter(p -> p instanceof ModuleFileSystemProvider)
+                .map(p -> (ModuleFileSystemProvider) p)
+                .findFirst()
+                .orElseThrow(() -> new ProviderNotFoundException("modulefs provider not found"));
+        return fsp.newFileSystem(URI.create(uri), Map.of());
+    }
+
+    private final String module;
+    private final FileSystemProvider provider;
     protected Path basePath;
 
-    ModuleFileSystem(Path basePath, FileSystemProvider provider) {
+    ModuleFileSystem(String module, Path basePath, FileSystemProvider provider) {
+        this.module = module;
         this.basePath = basePath;
         this.provider = provider;
     }
@@ -23,6 +36,10 @@ public abstract class ModuleFileSystem extends FileSystem {
 
     FileSystemProvider getBaseProvider() {
         return basePath.getFileSystem().provider();
+    }
+
+    Path getRoot() {
+        return new ModulePath(this, basePath);
     }
 
     @Override
@@ -72,5 +89,9 @@ public abstract class ModuleFileSystem extends FileSystem {
     @Override
     public WatchService newWatchService() throws IOException {
         return basePath.getFileSystem().newWatchService();
+    }
+
+    public String getModule() {
+        return module;
     }
 }

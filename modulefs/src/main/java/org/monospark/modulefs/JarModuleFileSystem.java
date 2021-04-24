@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public final class JarModuleFileSystem extends ModuleFileSystem {
 
-    static Optional<FileSystem> create(FileSystemProvider provider, URI modUri) throws IOException {
+    static Optional<JarModuleFileSystem> create(
+            String module, FileSystemProvider provider, URI modUri) throws IOException {
         if (modUri.getPath().endsWith(".jar")) {
             var fsUri = URI.create("jar:" + modUri.toString());
             FileSystem jarFs;
@@ -36,7 +34,7 @@ public final class JarModuleFileSystem extends ModuleFileSystem {
                         }
                     }
                 }
-                return Optional.of(new JarModuleFileSystem(jarFs.getPath("/"), modFilePath, provider));
+                return Optional.of(new JarModuleFileSystem(module, jarFs.getPath("/"), modFilePath, provider));
             }
         }
         return Optional.empty();
@@ -44,10 +42,10 @@ public final class JarModuleFileSystem extends ModuleFileSystem {
 
     private static final Map<Path,Integer> openFsCounts = new HashMap<>();
 
-    private Path jarFilePath;
+    private final Path jarFilePath;
 
-    JarModuleFileSystem(Path basePath, Path jarFilePath, FileSystemProvider provider) {
-        super(basePath, provider);
+    JarModuleFileSystem(String module, Path basePath, Path jarFilePath, FileSystemProvider provider) {
+        super(module, basePath, provider);
         this.jarFilePath = jarFilePath;
         synchronized (openFsCounts) {
             openFsCounts.put(jarFilePath, openFsCounts.getOrDefault(jarFilePath, 0) + 1);

@@ -57,7 +57,7 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
+    public ModuleFileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
         checkUri(uri);
 
         String moduleName = uri.getPath().substring(1);
@@ -70,9 +70,9 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
                 "Location of module " + moduleName + " is unknown"));
 
         var fs = Stream.of(
-                JrtModuleFileSystem.create(this, uri, modUri),
-                JarModuleFileSystem.create(this, modUri),
-                ExplodedModuleFileSystem.create(this, modUri))
+                JrtModuleFileSystem.create(moduleName, this, uri, modUri),
+                JarModuleFileSystem.create(moduleName, this, modUri),
+                ExplodedModuleFileSystem.create(moduleName, this, modUri))
                 .flatMap(Optional::stream)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(

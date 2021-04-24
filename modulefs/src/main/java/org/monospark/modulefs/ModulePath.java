@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class ModulePath implements Path {
 
-    private ModuleFileSystem fs;
-    private Path wrappedPath;
+    private final ModuleFileSystem fs;
+    private final Path wrappedPath;
 
     ModulePath(ModuleFileSystem fs, Path wrappedPath) {
         this.fs = fs;
@@ -36,7 +37,7 @@ public class ModulePath implements Path {
 
     @Override
     public Path getRoot() {
-        return wrappedPath.getRoot();
+        return fs.getRoot();
     }
 
     @Override
@@ -64,93 +65,144 @@ public class ModulePath implements Path {
         return wrappedPath.subpath(beginIndex, endIndex);
     }
 
+    private Path getNullableWrappedPathInternal(Path other) {
+        Objects.requireNonNull(other, "other");
+        if (!(other instanceof ModulePath)) {
+            return null;
+        }
+        var cast = (ModulePath) other;
+        if (!cast.fs.equals(fs)) {
+            return null;
+        }
+
+        return cast.wrappedPath;
+    }
+
+    private Path getNonNullWrappedPathInternal(Path other) {
+        Objects.requireNonNull(other, "other");
+        if (!(other instanceof ModulePath)) {
+            throw new ProviderMismatchException();
+        }
+        var cast = (ModulePath) other;
+        return cast.wrappedPath;
+    }
+
     @Override
     public boolean startsWith(Path other) {
-        return false;
+        var wp = getNullableWrappedPathInternal(other);
+        return wp != null && wrappedPath.startsWith(wp);
     }
 
     @Override
     public boolean startsWith(String other) {
-        return false;
+        return startsWith(fs.getPath(other));
     }
 
     @Override
     public boolean endsWith(Path other) {
-        return false;
+        var wp = getNullableWrappedPathInternal(other);
+        return wp != null && wrappedPath.endsWith(wp);
     }
 
     @Override
     public boolean endsWith(String other) {
-        return false;
+        return endsWith(fs.getPath(other));
     }
 
     @Override
     public Path normalize() {
-        return null;
+        return new ModulePath(fs, wrappedPath.normalize());
     }
 
     @Override
     public Path resolve(Path other) {
-        return null;
+        var wp = getNonNullWrappedPathInternal(other);
+        if (wp.isAbsolute()) {
+            return other;
+        }
+
+        return new ModulePath(fs, wrappedPath.resolve(wp));
     }
 
     @Override
     public Path resolve(String other) {
-        return null;
+        return new ModulePath(fs, wrappedPath.resolve(other));
     }
 
     @Override
     public Path resolveSibling(Path other) {
-        return null;
+        var wp = getNonNullWrappedPathInternal(other);
+        if (wp.isAbsolute()) {
+            return other;
+        }
+
+        return new ModulePath(fs, wrappedPath.resolveSibling(wp));
     }
 
     @Override
     public Path resolveSibling(String other) {
-        return null;
+        return new ModulePath(fs, wrappedPath.resolveSibling(other));
     }
 
     @Override
     public Path relativize(Path other) {
-        return null;
+        var wp = getNonNullWrappedPathInternal(other);
+        return new ModulePath(fs, wrappedPath.relativize(wp));
     }
 
     @Override
     public URI toUri() {
-        return null;
+        return URI.create("module:/" + fs.getModule() + "!" + wrappedPath.toAbsolutePath().toString());
     }
 
     @Override
     public Path toAbsolutePath() {
-        return null;
+        return new ModulePath(fs, wrappedPath.toAbsolutePath());
     }
 
     @Override
     public Path toRealPath(LinkOption... options) throws IOException {
-        return null;
+        return new ModulePath(fs, wrappedPath.toRealPath(options));
     }
 
     @Override
     public File toFile() {
-        return null;
+        return wrappedPath.toFile();
     }
 
     @Override
-    public WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers) throws IOException {
-        return null;
+    public WatchKey register(
+            WatchService watcher,
+            WatchEvent.Kind<?>[] events,
+            WatchEvent.Modifier... modifiers) throws IOException {
+        return wrappedPath.register(watcher, events, modifiers);
     }
 
     @Override
     public WatchKey register(WatchService watcher, WatchEvent.Kind<?>... events) throws IOException {
-        return null;
+        return wrappedPath.register(watcher, events);
     }
 
     @Override
     public Iterator<Path> iterator() {
-        return null;
+        return new Iterator<>() {
+            private final Iterator<Path> wrappedIterator = wrappedPath.iterator();
+
+            @Override
+            public boolean hasNext() {
+                return wrappedIterator.hasNext();
+            }
+
+            @Override
+            public Path next() {
+                return new ModulePath(fs, wrappedIterator.next());
+            }
+        };
     }
 
     @Override
     public int compareTo(Path other) {
-        return 0;
+        var wp = getNonNullWrappedPathInternal(other);
+        return wrappedPath.compareTo(wp);
     }
 }
