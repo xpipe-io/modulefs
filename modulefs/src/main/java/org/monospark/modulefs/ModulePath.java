@@ -88,6 +88,11 @@ public class ModulePath implements Path {
     }
 
     @Override
+    public String toString() {
+        return wrappedPath.toString();
+    }
+
+    @Override
     public boolean startsWith(Path other) {
         var wp = getNullableWrappedPathInternal(other);
         return wp != null && wrappedPath.startsWith(wp);
@@ -152,7 +157,7 @@ public class ModulePath implements Path {
 
     @Override
     public URI toUri() {
-        return URI.create("module:/" + fs.getModule() + "!/" + wrappedPath.relativize(fs.basePath).toString());
+        return URI.create("module:/" + fs.getModule() + "!/" + fs.basePath.relativize(wrappedPath).toString());
     }
 
     @Override
@@ -205,4 +210,6 @@ public class ModulePath implements Path {
         var wp = getNonNullWrappedPathInternal(other);
         return wrappedPath.compareTo(wp);
     }
+
+
 }

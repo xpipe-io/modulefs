@@ -135,7 +135,8 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
         var mp = ((ModulePath) dir);
-        return mp.getModuleFileSystem().getBaseProvider().newDirectoryStream(mp.getWrappedPath(), filter);
+        var ds = mp.getModuleFileSystem().getBaseProvider().newDirectoryStream(mp.getWrappedPath(), filter);
+        return new ModuleDirectoryStream(mp.getModuleFileSystem(), ds);
     }
 
     private ModulePath getModulePath(Path path) {
