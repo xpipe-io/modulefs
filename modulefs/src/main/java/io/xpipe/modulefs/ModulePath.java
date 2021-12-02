@@ -1,4 +1,4 @@
-package org.monospark.modulefs;
+package io.xpipe.modulefs;
 
 import java.io.File;
 import java.io.IOException;

@@ -9,8 +9,8 @@ plugins {
 setVersion '1.0-SNAPSHOT'
 
 application {
-    mainModule = 'org.monospark.modulefs.tests'
-    mainClass = 'org.monospark.modulefs.tests.Main'
+    mainModule = 'io.xpipe.modulefs.tests'
+    mainClass = 'io.xpipe.modulefs.tests.Main'
 }
 
 repositories {
@@ -41,8 +41,8 @@ sourceSets {
 
 java {
     modularity.inferModulePath = true
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 task copyModules(type: Copy) {
@@ -68,7 +68,7 @@ jlink {
 
     customImage {
         appModules = [
-                'org.monospark.modulefs.tests',
+                'io.xpipe.modulefs.tests',
         ]
     }
 }

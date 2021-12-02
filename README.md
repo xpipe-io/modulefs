@@ -1,6 +1,8 @@
 # ModuleFS library
 
-This library provides a simple file system to access the contents modules in a unified way.
+The modulefs library provides a simple file system implementation to access the contents of Java modules in a unified way.
+
+Note that as this library is relatively new and is primarily used for internal projects, it might not be production ready for other purposes.
 
 ## Motivation
 

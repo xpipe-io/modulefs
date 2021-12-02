@@ -1,6 +1,6 @@
-module org.monospark.modulefs.tests.junit {
-    exports org.monospark.modulefs.tests.junit;
+module io.xpipe.modulefs.tests.junit {
+    exports io.xpipe.modulefs.tests.junit;
 
     requires org.junit.jupiter.api;
-    requires org.monospark.modulefs.tests;
+    requires io.xpipe.modulefs.tests;
 }

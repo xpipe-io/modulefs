@@ -1,8 +1,4 @@
-package org.monospark.modulefs.tests;
-
-import java.net.URI;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+package io.xpipe.modulefs.tests;
 
 public class Main {
 
