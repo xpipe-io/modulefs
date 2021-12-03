@@ -15,6 +15,21 @@ If you are still interested in trying it out, you can use it as follows:
         implementation 'com.github.xpipe-io:modulefs:master-SNAPSHOT'
     }
 
+#### Maven
+
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependency>
+	    <groupId>com.github.xpipe-io</groupId>
+	    <artifactId>modulefs</artifactId>
+	    <version>master-SNAPSHOT</version>
+	</dependency>
+
 ## Motivation
 
 The [Path](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html) and
