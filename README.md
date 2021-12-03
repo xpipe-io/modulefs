@@ -12,7 +12,7 @@ If you are still interested in trying it out, you can use it as follows:
     }
     
     dependencies {
-        implementation 'com.github.xpipe-io:io.xpipe.modulefs:master-SNAPSHOT'
+        implementation 'com.github.xpipe-io:modulefs:master-SNAPSHOT'
     }
 
 ## Motivation
@@ -50,7 +50,8 @@ A simple file reading example could look like this:
 ````
 try (var fs = FileSystems.newFileSystem(
         URI.create("module:/com.myorg.mymodule"), Map.of())) {
-    // The file system paths start from the root of the module, so you have to include packages in your paths!
+    // The file system paths start from the root of the module,
+    // so you have to include packages in your paths!
     var filePath = fs.getPath("com/myorg/mymodule/test_resource.txt");
     var fileContent = Files.readString(filePath);
 }
