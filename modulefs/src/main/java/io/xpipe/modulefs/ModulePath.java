@@ -21,7 +21,7 @@ public class ModulePath implements Path {
         return fs;
     }
 
-    Path getWrappedPath() {
+    public Path getWrappedPath() {
         return wrappedPath;
     }
 
