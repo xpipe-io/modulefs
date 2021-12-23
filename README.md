@@ -2,34 +2,6 @@
 
 The ModuleFS library provides a simple file system implementation to access the contents of Java modules in a unified way.
 
-Note that as this library is relatively new and is primarily used for internal projects, it might not be production ready for other purposes.
-If you are still interested in trying it out, you can use it as follows:
-
-#### Gradle
-
-    repositories {
-        maven { url "https://jitpack.io" }
-    }
-    
-    dependencies {
-        implementation 'com.github.xpipe-io:modulefs:master-SNAPSHOT'
-    }
-
-#### Maven
-
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-
-	<dependency>
-	    <groupId>com.github.xpipe-io</groupId>
-	    <artifactId>modulefs</artifactId>
-	    <version>master-SNAPSHOT</version>
-	</dependency>
-
 ## Motivation
 
 The [Path](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html) and
@@ -93,7 +65,35 @@ try (var fs = FileSystems.newFileSystem(
 Basically, you can make use of any method in the
 [Files](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html) class.
 
+## Installation
 
+Note that as this library is relatively new and is primarily used for internal projects, it might not be production ready for other purposes.
+If you are still interested in trying it out, you can use it as follows:
+
+#### Gradle
+
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+    
+    dependencies {
+        implementation 'com.github.xpipe-io:modulefs:master-SNAPSHOT'
+    }
+
+#### Maven
+
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependency>
+	    <groupId>com.github.xpipe-io</groupId>
+	    <artifactId>modulefs</artifactId>
+	    <version>master-SNAPSHOT</version>
+	</dependency>
 
 ## Development
 
