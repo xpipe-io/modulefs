@@ -39,7 +39,7 @@ public abstract class ModuleFileSystem extends FileSystem {
         return basePath.getFileSystem().provider();
     }
 
-    Path getRoot() {
+    ModulePath getRoot() {
         return new ModulePath(this, basePath);
     }
 
@@ -55,7 +55,7 @@ public abstract class ModuleFileSystem extends FileSystem {
 
     @Override
     public Iterable<Path> getRootDirectories() {
-        return Set.of(basePath);
+        return Set.of(new ModulePath(this, basePath));
     }
 
     @Override
@@ -70,7 +70,7 @@ public abstract class ModuleFileSystem extends FileSystem {
     }
 
     @Override
-    public Path getPath(String first, String... more) {
+    public ModulePath getPath(String first, String... more) {
         var current = basePath.resolve(first);
         for (var m : more) {
             current = current.resolve(m);
