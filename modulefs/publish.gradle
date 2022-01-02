@@ -1,0 +1,50 @@
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'ModuleFS'
+                description = 'The ModuleFS library provides a simple file system implementation to access the contents of Java modules in a unified way.'
+                url = 'https://github.com/xpipe-io/modulefs'
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'https://github.com/xpipe-io/modulefs/LICENSE.md'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'crschnick'
+                        name = 'Christopher Schnick'
+                        email = 'crschnick@xpipe.io'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/xpipe-io/modulefs.git'
+                    developerConnection = 'scm:git:ssh://github.com/xpipe-io/modulefs.git'
+                    url = 'https://github.com/xpipe-io/modulefs'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                setUsername "${project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''}"
+                setPassword "${project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''}"
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

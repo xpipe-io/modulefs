@@ -1,9 +1,14 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
-setVersion '1.0-SNAPSHOT'
+apply from: 'publish.gradle'
+
+version '0.1'
+group 'io.xpipe'
+archivesBaseName = 'modulefs'
 
 repositories {
     mavenCentral()
@@ -23,15 +28,5 @@ javadoc {
     options {
         addStringOption('-release', '17')
         addStringOption('link', 'https://docs.oracle.com/en/java/javase/17/docs/api/')
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'io.xpipe'
-            artifactId 'modulefs'
-            from components.java
-        }
     }
 }

@@ -1,3 +1,7 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.xpipe/modulefs/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.xpipe/modulefs)
+[![javadoc](https://javadoc.io/badge2/io.xpipe/modulefs/javadoc.svg)](https://javadoc.io/doc/io.xpipe/modulefs)
+[![Build Status](https://travis-ci.org/xpipe-io/modulefs.svg?branch=master)](https://travis-ci.org/io.xpipe/modulefs)
+
 # ModuleFS library
 
 The ModuleFS library provides a simple file system implementation to access the contents of Java modules in a unified way.
@@ -116,6 +120,8 @@ If you are still interested in trying it out, you can use it as follows:
 	    <artifactId>modulefs</artifactId>
 	    <version>master-SNAPSHOT</version>
 	</dependency>
+
+The javadocs are available at [javadoc.io](https://javadoc.io/doc/io.xpipe/modulefs)
 
 ## Development
 
