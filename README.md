@@ -94,34 +94,9 @@ You can then use this URL to access any resources of the module in a normal fash
 ## Installation
 
 Note that as this library is relatively new and is primarily used for internal projects, it might not be production ready for other purposes.
-If you are still interested in trying it out, you can use it as follows:
-
-#### Gradle
-
-    repositories {
-        maven { url "https://jitpack.io" }
-    }
-    
-    dependencies {
-        implementation 'com.github.xpipe-io:modulefs:master-SNAPSHOT'
-    }
-
-#### Maven
-
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-
-	<dependency>
-	    <groupId>com.github.xpipe-io</groupId>
-	    <artifactId>modulefs</artifactId>
-	    <version>master-SNAPSHOT</version>
-	</dependency>
-
-The javadocs are available at [javadoc.io](https://javadoc.io/doc/io.xpipe/modulefs)
+If you are still interested in trying it out, you can find it in the
+[Maven Central Repository](https://search.maven.org/artifact/io.xpipe/modulefs).
+The javadocs are available at [javadoc.io](https://javadoc.io/doc/io.xpipe/modulefs).
 
 ## Development
 
