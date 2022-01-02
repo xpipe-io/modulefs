@@ -2,6 +2,7 @@ package io.xpipe.modulefs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
@@ -20,6 +21,16 @@ public class Examples {
                     return FileVisitResult.CONTINUE;
                 }
             });
+        }
+    }
+
+    public static void urlExample() throws IOException {
+        try (ModuleFileSystem fs =
+                     ModuleFileSystem.create("module:/com.myorg.mymodule")) {
+            ModulePath modulePath = fs.getPath("com/myorg/mymodule/test_resource.txt");
+            // Get the internal path of the module path
+            Path internalPath = modulePath.getWrappedPath();
+            URL usableUrl = internalPath.toUri().toURL();
         }
     }
 }

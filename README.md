@@ -34,7 +34,8 @@ ModuleFS allows you to create a FileSystem using the `module` URI scheme.
 The created FileSystem instance conforms to standard FileSystem behaviours
 with some limitations on writability as modules are read-only.
 A simple file reading example could look like this:
-````
+
+````java
 try (var fs = FileSystems.newFileSystem(
         URI.create("module:/com.myorg.mymodule"), Map.of())) {
     // The file system paths start from the root of the module,
@@ -47,7 +48,7 @@ try (var fs = FileSystems.newFileSystem(
 The Path API allows for more complex applications than just parsing the contents of a single file.
 For example, we can also easily recursively iterative over all files in a directory that exists inside your module:
 
-````
+````java
 try (var fs = FileSystems.newFileSystem(
         URI.create("module:/com.myorg.mymodule"), Map.of())) {
     
@@ -64,6 +65,27 @@ try (var fs = FileSystems.newFileSystem(
 
 Basically, you can make use of any method in the
 [Files](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html) class.
+
+#### Using URLs
+
+Many other java methods take [URLs](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html) as an input.
+As the modulefs library does not come with custom
+[URLStreamHandler](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URLStreamHandler.html)
+implementations required to make use of `module: ...` URLs,
+the easiest way of obtaining a usable URL is to access the wrapped internal Path and access its URL.
+
+````java
+try (ModuleFileSystem fs = ModuleFileSystem.create("module:/com.myorg.mymodule")) {
+    ModulePath modulePath = fs.getPath("com/myorg/mymodule/test_resource.txt");
+    // Get the internal path of the module path
+    Path internalPath = modulePath.getWrappedPath();
+    URL usableUrl = internalPath.toUri().toURL();
+}
+````
+
+In the above example, we explicitly use the ModuleFileSystem class to automatically get ModulePath instances when creating paths.
+This allows us to use the `getWrappedPath()` method to obtain the internal path, which returns an `file:`, `jar:`, or `jrt:` URL.
+You can then use this URL to access any resources of the module in a normal fashion by passing the URL.
 
 ## Installation
 
