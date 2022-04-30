@@ -6,7 +6,7 @@ plugins {
 
 apply from: 'publish.gradle'
 
-version '0.1'
+version '0.1.1'
 group 'io.xpipe'
 archivesBaseName = 'modulefs'
 
@@ -14,13 +14,12 @@ repositories {
     mavenCentral()
 }
 
-java {
-    modularity.inferModulePath = true
+tasks.withType(JavaCompile).configureEach {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-
-    withJavadocJar()
-    withSourcesJar()
+    modularity.inferModulePath = true
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked"
 }
 
 javadoc {
@@ -28,5 +27,6 @@ javadoc {
     options {
         addStringOption('-release', '17')
         addStringOption('link', 'https://docs.oracle.com/en/java/javase/17/docs/api/')
+        addBooleanOption('html5', true)
     }
 }

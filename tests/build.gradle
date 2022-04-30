@@ -38,11 +38,12 @@ sourceSets {
     }
 }
 
-
-java {
-    modularity.inferModulePath = true
+tasks.withType(JavaCompile).configureEach {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    modularity.inferModulePath = true
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked"
 }
 
 task copyModules(type: Copy) {

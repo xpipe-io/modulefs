@@ -2,6 +2,7 @@ package io.xpipe.modulefs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.module.ResolvedModule;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
@@ -53,17 +54,34 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         }
     }
 
+    private Optional<ResolvedModule> resolveModule(String name, ModuleLayer l) {
+        var found = l.configuration().modules().stream()
+                .filter(r -> r.name().equals(name))
+                .findFirst();
+        if (found.isPresent()) {
+            return found;
+        }
+
+        for (var p : l.parents()) {
+            var r = resolveModule(name, p);
+            if (r.isPresent()) {
+                return r;
+            }
+        }
+
+        return Optional.empty();
+    }
+
     @Override
     public ModuleFileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
         checkUri(uri);
 
+        var layer = env.containsKey("layer") ? (ModuleLayer) env.get("layer") : ModuleLayer.boot();
         String moduleName = uri.getPath().substring(1);
-        var loc = ModuleLayer.boot().configuration().modules().stream()
-                .filter(r -> r.name().equals(moduleName))
-                .findFirst()
+        var loc = resolveModule(moduleName, layer)
                 .orElseThrow(() -> new FileSystemNotFoundException(
-                        "Module " + moduleName + " was not resolved")).reference().location();
-        var modUri = loc.orElseThrow(() -> new IllegalArgumentException(
+                        "Module " + moduleName + " was not resolved"));
+        var modUri = loc.reference().location().orElseThrow(() -> new IllegalArgumentException(
                 "Location of module " + moduleName + " is unknown"));
 
         var fs = Stream.of(
