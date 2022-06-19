@@ -1,6 +1,6 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.xpipe/modulefs/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.xpipe/modulefs)
 [![javadoc](https://javadoc.io/badge2/io.xpipe/modulefs/javadoc.svg)](https://javadoc.io/doc/io.xpipe/modulefs)
-[![Build Status](https://travis-ci.org/xpipe-io/modulefs.svg?branch=master)](https://travis-ci.org/io.xpipe/modulefs)
+[![Build Status](https://github.com/xpipe-io/modulefs/actions/workflows/publish.yml/badge.svg)](https://github.com/xpipe-io/modulefs/actions/workflows/publish.yml)
 
 # ModuleFS library
 
