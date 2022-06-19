@@ -3,6 +3,16 @@ java {
     withSourcesJar()
 }
 
+def isSnapshot = project.getVersion().endsWith('SNAPSHOT')
+def repoUrl = isSnapshot ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+        : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
+def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
+
+if (!isSnapshot) {
+    publish.finalizedBy(rootProject.getTasks().getByName('closeAndReleaseRepository'))
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -36,10 +46,10 @@ publishing {
 
     repositories {
         maven {
-            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            setUrl repoUrl
             credentials {
-                setUsername "${project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''}"
-                setPassword "${project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''}"
+                setUsername user
+                setPassword pass
             }
         }
     }
@@ -47,4 +57,11 @@ publishing {
 
 signing {
     sign publishing.publications.mavenJava
+}
+
+nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    packageGroup = "io.xpipe"
+    username = user
+    password = pass
 }
