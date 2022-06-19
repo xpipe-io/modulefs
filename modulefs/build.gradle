@@ -4,7 +4,7 @@ plugins {
     id 'signing'
 }
 
-version '0.1.4'
+version '0.1.5-SNAPSHOT'
 group 'io.xpipe'
 archivesBaseName = 'modulefs'
 
