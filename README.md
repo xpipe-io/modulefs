@@ -70,13 +70,30 @@ try (var fs = FileSystems.newFileSystem(
 Basically, you can make use of any method in the
 [Files](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html) class.
 
-#### Using URLs
+
+### Module Layers
+
+In case you are using custom [ModuleLayers](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ModuleLayer.html),
+you will have to pass this information to the file system to correctly locate all modules of this layer:
+
+````java
+ModuleLayer customLayer = ... ;
+try (var fs = FileSystems.newFileSystem(
+        URI.create("module:/com.myorg.mymodule"), Map.of("layer", customLayer))) {
+    ...
+}
+````
+
+### Using URLs
 
 Many other java methods take [URLs](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html) as an input.
-As the modulefs library does not come with custom
+One problem with many libraries, even standard libraries, is that they hardcode/expect
+URLs with a certain protocol, e.g. `file:` or `jar:`.
+To adapt ModuleFS to this limitation, the ModuleFS library does not come with custom
 [URLStreamHandler](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URLStreamHandler.html)
-implementations required to make use of `module: ...` URLs,
-the easiest way of obtaining a usable URL is to access the wrapped internal Path and access its URL.
+implementations required to make use of `module: ...` URLs.
+
+The easiest way of obtaining a usable URL is to access the wrapped internal Path and access its URL:
 
 ````java
 try (ModuleFileSystem fs = ModuleFileSystem.create("module:/com.myorg.mymodule")) {
@@ -91,13 +108,6 @@ In the above example, we explicitly use the ModuleFileSystem class to automatica
 This allows us to use the `getWrappedPath()` method to obtain the internal path, which returns an `file:`, `jar:`, or `jrt:` URL.
 You can then use this URL to access any resources of the module in a normal fashion by passing the URL.
 
-## Installation
-
-Note that as this library is relatively new and is primarily used for internal projects, it might not be production ready for other purposes.
-If you are still interested in trying it out, you can find it in the
-[Maven Central Repository](https://search.maven.org/artifact/io.xpipe/modulefs).
-The javadocs are available at [javadoc.io](https://javadoc.io/doc/io.xpipe/modulefs).
-
 ## Development
 
 Testing is made more difficult by the fact that we also have to run all tests in a jlink image to achieve good coverage.
@@ -109,3 +119,7 @@ To run all tests, we need to run the following commands:
 - `gradle :tests:test` (Exploded module)
 - `gradle :tests:run` (Module jar)
 - `gradle :tests:createImage` and then run `jlink_tests.bat` (jlink image)
+
+Some features and use cases have not been tested yet.
+For example, an application that uses a mix of full modules,
+automatic modules, and non-modular jars has not been tested yet.
