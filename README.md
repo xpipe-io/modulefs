@@ -5,7 +5,7 @@
 # ModuleFS library
 
 The ModuleFS library provides a simple file system implementation to access the contents of Java modules in a unified way.
-It also comes with a variety of neat1 features that will make working with modules more enjoyable for you.
+It also comes with a variety of neat features that will make working with modules more enjoyable for you.
 You can get the library through [maven central](https://search.maven.org/artifact/io.xpipe/modulefs).
 
 
