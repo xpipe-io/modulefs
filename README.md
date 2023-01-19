@@ -7,6 +7,7 @@
 The ModuleFS library provides a simple file system implementation to access the contents of Java modules in a unified way.
 It also comes with a variety of neat features that will make working with modules more enjoyable for you.
 You can get the library through [maven central](https://search.maven.org/artifact/io.xpipe/modulefs).
+Note that at least Java 17 is required as it is the first LTS release that includes all necessary bug fixes for the internal module file systems.
 
 
 ## Motivation
@@ -131,6 +132,21 @@ As ModuleFS does only work through the underlying file systems,
 you will not run into any permission issues when using ModuleFS, i.e.
 you can even access resources from modules that are not open at all.
 
+### Module References
+
+In case you are loading modules at runtime and want to access the file system of a module before a proper module layer is created,
+you can also create a module file system for a
+[ModuleReference](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ModuleReference.html) like this:
+
+````java
+Path path = ...;
+var finder = ModuleFinder.of(path);
+var moduleReference = finder.find("myorg.mymodule")
+        .orElseThrow(() -> new IllegalArgumentException("Module not found"));
+try (var fs = ModuleFileSystem.create(moduleReference)) {
+    ...
+}
+````
 
 
 ## Development

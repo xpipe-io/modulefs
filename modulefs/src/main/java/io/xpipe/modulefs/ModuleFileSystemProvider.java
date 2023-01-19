@@ -2,6 +2,7 @@ package io.xpipe.modulefs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -77,21 +78,26 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         checkUri(uri);
 
         var layer = env.containsKey("layer") ? (ModuleLayer) env.get("layer") : ModuleLayer.boot();
+        var moduleLocation = env.containsKey("location") ? (URI) env.get("location") : null;
         String moduleName = uri.getPath().substring(1);
-        var loc = resolveModule(moduleName, layer)
-                .orElseThrow(() -> new FileSystemNotFoundException(
-                        "Module " + moduleName + " was not resolved"));
-        var modUri = loc.reference().location().orElseThrow(() -> new IllegalArgumentException(
-                "Location of module " + moduleName + " is unknown"));
 
+        if (moduleLocation == null) {
+            var loc = resolveModule(moduleName, layer)
+                    .orElseThrow(() -> new FileSystemNotFoundException(
+                            "Module " + moduleName + " was not resolved"));
+            moduleLocation = loc.reference().location().orElseThrow(() -> new IllegalArgumentException(
+                    "Location of module " + moduleName + " is unknown"));
+        }
+
+        var scheme = moduleLocation.getScheme();
         var fs = Stream.of(
-                JrtModuleFileSystem.create(moduleName, this, uri, modUri),
-                JarModuleFileSystem.create(moduleName, this, modUri),
-                ExplodedModuleFileSystem.create(moduleName, this, modUri))
+                JrtModuleFileSystem.create(moduleName, this, uri, moduleLocation),
+                JarModuleFileSystem.create(moduleName, this, moduleLocation),
+                ExplodedModuleFileSystem.create(moduleName, this, moduleLocation))
                 .flatMap(Optional::stream)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Unsupported module file system type " + modUri.getScheme()));
+                        "Unsupported module file system type " + scheme));
         filesystems.put(moduleName, fs);
         return fs;
     }

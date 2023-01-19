@@ -1,6 +1,7 @@
 package io.xpipe.modulefs;
 
 import java.io.IOException;
+import java.lang.module.ModuleReference;
 import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
@@ -18,6 +19,18 @@ public abstract class ModuleFileSystem extends FileSystem {
                 .findFirst()
                 .orElseThrow(() -> new ProviderNotFoundException("modulefs provider not found"));
         return fsp.newFileSystem(URI.create(uri), Map.of());
+    }
+
+    public static ModuleFileSystem create(ModuleReference reference) throws IOException {
+        ModuleFileSystemProvider fsp = FileSystemProvider.installedProviders().stream()
+                .filter(p -> p instanceof ModuleFileSystemProvider)
+                .map(p -> (ModuleFileSystemProvider) p)
+                .findFirst()
+                .orElseThrow(() -> new ProviderNotFoundException("modulefs provider not found"));
+        var location = reference.location().orElseThrow(() -> new IllegalArgumentException("Module reference location is unknown"));
+        var name = reference.descriptor().name();
+        var uri = URI.create("module:/" + name);
+        return fsp.newFileSystem(uri, Map.of("location", location));
     }
 
     private final String module;
