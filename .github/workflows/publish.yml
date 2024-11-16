@@ -10,16 +10,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           version: '21.3.0'
           java-version: '17'
-
-      - name: Verify Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
 
       - name: Publish
         run: ./gradlew publish
@@ -30,7 +27,7 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: modulefs
           path: modulefs/build/libs

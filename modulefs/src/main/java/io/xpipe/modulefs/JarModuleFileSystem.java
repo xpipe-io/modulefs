@@ -23,15 +23,13 @@ public final class JarModuleFileSystem extends ModuleFileSystem {
                 if (openFsCounts.containsKey(modFilePath)) {
                     jarFs = FileSystems.getFileSystem(fsUri);
                 } else {
-                    boolean isWritable = modFilePath.toFile().canWrite();
-                    if (isWritable && !modFilePath.toFile().setWritable(false)) {
-                        throw new IOException("Unable to make file " + modFilePath + " not writable");
-                    }
                     jarFs = FileSystems.newFileSystem(fsUri, Map.of());
-                    if (isWritable) {
-                        if (!modFilePath.toFile().setWritable(true)) {
-                            throw new IOException("Unable to make file " + modFilePath + " writable");
-                        }
+                    try {
+                        var m = jarFs.getClass().getDeclaredMethod("setReadOnly");
+                        m.invoke(jarFs);
+                    } catch (IllegalAccessException ignored) {
+                    } catch (Exception e) {
+                        throw new RuntimeException("Unable to make file " + modFilePath + " read-only", e);
                     }
                 }
                 return Optional.of(new JarModuleFileSystem(module, jarFs.getPath("/"), modFilePath, provider));
