@@ -9,6 +9,27 @@ It also comes with a variety of neat features that will make working with module
 You can get the library through [maven central](https://search.maven.org/artifact/io.xpipe/modulefs).
 Note that at least Java 17 is required as it is the first LTS release that includes all necessary bug fixes for the internal module file systems.
 
+## Installation
+
+To use ModuleFS with Maven you have to add it as a dependency:
+
+    <dependency>
+      <groupId>io.xpipe</groupId>
+      <artifactId>modulefs</artifactId>
+      <version>0.1.6</version>
+    </dependency>
+
+For gradle, add the following entries to your build.gradle file:
+
+    dependencies {
+        implementation group: 'io.xpipe', name: 'modulefs', version: '0.1.6'
+    }
+
+Add the library to your project's module-info like this:
+
+    requires io.xpipe.modulefs;
+
+Note that ModuleFS requires your project to be modularized.
 
 ## Motivation
 
