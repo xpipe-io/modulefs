@@ -140,7 +140,7 @@ try (ModuleFileSystem fs = ModuleFileSystem.create("module:/com.myorg.mymodule")
 In the above example, we explicitly use the ModuleFileSystem class to automatically get ModulePath instances when creating paths.
 This allows us to use the `getWrappedPath()` method to obtain the internal path, which returns an `file:`, `jar:`, or `jrt:` URL.
 You can then use this URL to access any resources of the module in a normal fashion by passing the URL.
-Note that this requires had a file system to be created through the `ModuleFileSystem` class, not the `FileSystem` class.
+Note that this requires a file system to be created through the `ModuleFileSystem` class, not the `FileSystem` class.
 
 ### Bypassing Encapsulation
 
