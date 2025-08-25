@@ -4,8 +4,8 @@ java {
 }
 
 def isSnapshot = project.getVersion().endsWith('SNAPSHOT')
-def repoUrl = isSnapshot ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-        : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+def repoUrl = isSnapshot ? 'https://central.sonatype.com/repository/maven-snapshots/'
+        : "https://central.sonatype.com/api/v1/publisher"
 def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
 def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
 
@@ -66,7 +66,7 @@ signing {
 }
 
 nexusStaging {
-    serverUrl = "https://central.sonatype.com"
+    serverUrl = "https://central.sonatype.com/api/v1/publisher"
     packageGroup = "io.xpipe"
     username = user
     password = pass
