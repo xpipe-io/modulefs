@@ -66,7 +66,7 @@ signing {
 }
 
 nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    serverUrl = "https://central.sonatype.com"
     packageGroup = "io.xpipe"
     username = user
     password = pass
