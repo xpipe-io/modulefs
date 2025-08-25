@@ -3,16 +3,6 @@ java {
     withSourcesJar()
 }
 
-def isSnapshot = project.getVersion().endsWith('SNAPSHOT')
-def repoUrl = isSnapshot ? 'https://central.sonatype.com/repository/maven-snapshots/'
-        : "https://ossrh-staging-api.central.sonatype.com/service/local/"
-def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
-def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
-
-if (!isSnapshot) {
-    publish.finalizedBy(rootProject.getTasks().getByName('closeAndReleaseRepository'))
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -43,16 +33,6 @@ publishing {
             }
         }
     }
-
-    repositories {
-        maven {
-            setUrl repoUrl
-            credentials {
-                setUsername user
-                setPassword pass
-            }
-        }
-    }
 }
 
 def signingKeyId = project.hasProperty('signingKeyId') ? project.property("signingKeyId") : System.getenv('GPG_KEY_ID')
@@ -65,9 +45,21 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-nexusStaging {
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
-    packageGroup = "io.xpipe"
-    username = user
-    password = pass
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
+def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
+def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
+
+nexusPublishing  {
+    repositories {
+        sonatype  {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri('https://central.sonatype.com/repository/maven-snapshots/'))
+            username = user
+            password = pass
+        }
+    }
+    useStaging = true
 }
