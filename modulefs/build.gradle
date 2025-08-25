@@ -4,6 +4,7 @@ plugins {
     id 'signing'
 }
 
+version '0.1.7'
 base.archivesName = 'modulefs'
 
 apply from: 'publish.gradle'
