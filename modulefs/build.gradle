@@ -4,8 +4,6 @@ plugins {
     id 'signing'
 }
 
-version '0.1.7'
-group 'io.xpipe'
 base.archivesName = 'modulefs'
 
 apply from: 'publish.gradle'
