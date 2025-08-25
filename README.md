@@ -16,13 +16,13 @@ To use ModuleFS with Maven you have to add it as a dependency:
     <dependency>
       <groupId>io.xpipe</groupId>
       <artifactId>modulefs</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
 
 For gradle, add the following entries to your build.gradle file:
 
     dependencies {
-        implementation group: 'io.xpipe', name: 'modulefs', version: '0.1.6'
+        implementation group: 'io.xpipe', name: 'modulefs', version: '0.1.7'
     }
 
 Add the library to your project's module-info like this:

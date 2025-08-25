@@ -1,6 +1,7 @@
 package io.xpipe.modulefs;
 
 import java.io.IOException;
+import java.lang.reflect.InaccessibleObjectException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -25,9 +26,10 @@ public final class JarModuleFileSystem extends ModuleFileSystem {
                 } else {
                     jarFs = FileSystems.newFileSystem(fsUri, Map.of());
                     try {
-                        var m = jarFs.getClass().getDeclaredMethod("setReadOnly");
-                        m.invoke(jarFs);
-                    } catch (IllegalAccessException ignored) {
+                        var m = jarFs.getClass().getDeclaredField("readOnly");
+                        m.setAccessible(true);
+                        m.set(jarFs, true);
+                    } catch (IllegalAccessException | NoSuchFieldException | InaccessibleObjectException ignored) {
                     } catch (Exception e) {
                         throw new RuntimeException("Unable to make file " + modFilePath + " read-only", e);
                     }
