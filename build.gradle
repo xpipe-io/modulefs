@@ -3,22 +3,23 @@ plugins {
 }
 
 group 'io.xpipe'
-
-def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
-def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
+version '0.1.7'
 
 tasks.withType(GenerateModuleMetadata).configureEach {
     enabled = false
 }
 
+def user = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : System.getenv('SONATYPE_USERNAME')
+def pass = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : System.getenv('SONATYPE_PASSWORD')
+
 nexusPublishing  {
     repositories {
         sonatype  {
+            stagingProfileId = "3296258e-7ae3-4559-9365-00733c4b6db0"
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri('https://central.sonatype.com/repository/maven-snapshots/'))
             username = user
             password = pass
         }
     }
-    useStaging = true
 }

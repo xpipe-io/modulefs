@@ -5,6 +5,7 @@ plugins {
 }
 
 version '0.1.7'
+group 'io.xpipe'
 base.archivesName = 'modulefs'
 
 apply from: 'publish.gradle'
@@ -28,4 +29,8 @@ javadoc {
         addStringOption('link', 'https://docs.oracle.com/en/java/javase/17/docs/api/')
         addBooleanOption('html5', true)
     }
+}
+
+test {
+    failOnNoDiscoveredTests = false
 }
