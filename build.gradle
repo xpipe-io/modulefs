@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.xpipe'
-version '0.1.7'
+version '0.1.8'
 
 tasks.withType(GenerateModuleMetadata).configureEach {
     enabled = false

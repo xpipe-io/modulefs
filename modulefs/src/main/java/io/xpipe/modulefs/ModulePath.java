@@ -47,7 +47,7 @@ public class ModulePath implements Path {
 
     @Override
     public Path getParent() {
-        return wrappedPath.getParent();
+        return new ModulePath(fs, wrappedPath.getParent());
     }
 
     @Override
@@ -57,12 +57,12 @@ public class ModulePath implements Path {
 
     @Override
     public Path getName(int index) {
-        return wrappedPath.getName(index);
+        return new ModulePath(fs, wrappedPath.getName(index));
     }
 
     @Override
     public Path subpath(int beginIndex, int endIndex) {
-        return wrappedPath.subpath(beginIndex, endIndex);
+        return new ModulePath(fs, wrappedPath.subpath(beginIndex, endIndex));
     }
 
     private Path getNullableWrappedPathInternal(Path other) {
