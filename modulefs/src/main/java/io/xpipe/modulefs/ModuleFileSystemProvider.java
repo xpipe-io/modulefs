@@ -81,6 +81,10 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
         var moduleLocation = env.containsKey("location") ? (URI) env.get("location") : null;
         String moduleName = uri.getPath().substring(1);
 
+        var envToPass = new HashMap<String, Object>(env);
+        envToPass.remove("layer");
+        envToPass.remove("location");
+
         if (moduleLocation == null) {
             var loc = resolveModule(moduleName, layer)
                     .orElseThrow(() -> new FileSystemNotFoundException(
@@ -91,9 +95,9 @@ public class ModuleFileSystemProvider extends FileSystemProvider {
 
         var scheme = moduleLocation.getScheme();
         var fs = Stream.of(
-                JrtModuleFileSystem.create(moduleName, this, uri, moduleLocation),
-                JarModuleFileSystem.create(moduleName, this, moduleLocation),
-                ExplodedModuleFileSystem.create(moduleName, this, moduleLocation))
+                JrtModuleFileSystem.create(moduleName, this, uri, moduleLocation, envToPass),
+                JarModuleFileSystem.create(moduleName, this, moduleLocation, envToPass),
+                ExplodedModuleFileSystem.create(moduleName, this, moduleLocation, envToPass))
                 .flatMap(Optional::stream)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(

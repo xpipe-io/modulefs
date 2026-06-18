@@ -14,7 +14,7 @@ import java.util.Optional;
 public final class JarModuleFileSystem extends ModuleFileSystem {
 
     static Optional<JarModuleFileSystem> create(
-            String module, FileSystemProvider provider, URI modUri) throws IOException {
+            String module, FileSystemProvider provider, URI modUri, Map<String, Object> env) throws IOException {
         if (modUri.getPath().endsWith(".jar")) {
             var fsUri = URI.create("jar:" + modUri.toString());
             FileSystem jarFs;
@@ -24,7 +24,7 @@ public final class JarModuleFileSystem extends ModuleFileSystem {
                 if (openFsCounts.containsKey(modFilePath)) {
                     jarFs = FileSystems.getFileSystem(fsUri);
                 } else {
-                    jarFs = FileSystems.newFileSystem(fsUri, Map.of());
+                    jarFs = FileSystems.newFileSystem(fsUri, env);
                     try {
                         var m = jarFs.getClass().getDeclaredField("readOnly");
                         m.setAccessible(true);

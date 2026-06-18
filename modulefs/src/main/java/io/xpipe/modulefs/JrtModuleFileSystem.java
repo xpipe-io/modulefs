@@ -2,9 +2,11 @@ package io.xpipe.modulefs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,10 +16,14 @@ public final class JrtModuleFileSystem extends ModuleFileSystem {
             String module,
             FileSystemProvider provider,
             URI uri,
-            URI location) throws IOException {
+            URI location,
+            Map<String, Object> env) throws IOException {
         if (location.getScheme().equals("jrt")) {
             String moduleName = uri.getPath().substring(1);
-            var fs = FileSystems.newFileSystem(URI.create("jrt:/"), Map.of());
+            var existingFileSystem = (FileSystem) env.get("jrtFileSystem");
+            var envToPass = new HashMap<>(env);
+            envToPass.remove("jrtFileSystem");
+            var fs = existingFileSystem != null ? existingFileSystem : FileSystems.newFileSystem(URI.create("jrt:/"), envToPass);
             var basePath = fs.getPath("modules", moduleName);
             return Optional.of(new JrtModuleFileSystem(module, basePath, provider));
         }

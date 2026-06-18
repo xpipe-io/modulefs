@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Map;
 import java.util.Optional;
 
 public class ExplodedModuleFileSystem extends ModuleFileSystem {
 
-    static Optional<ExplodedModuleFileSystem> create(String module, FileSystemProvider provider, URI location) throws IOException {
+    static Optional<ExplodedModuleFileSystem> create(String module, FileSystemProvider provider, URI location, Map<String, Object> env) throws IOException {
         if (location.getScheme().equals("file")) {
             var basePath = Path.of(location);
             return Optional.of(new ExplodedModuleFileSystem(module, basePath, provider));
